@@ -146,6 +146,7 @@ add_executable(AngelAuraAmethyst
   JavaGUIViewController.m
   LauncherMenuViewController.m
   LauncherNavigationController.m
+  LauncherExtrasViewController.m
   LauncherNewsViewController.m
   LauncherPreferences.m
   LauncherPreferencesViewController.m
@@ -206,3 +207,4 @@ set_target_properties(AngelAuraAmethyst PROPERTIES
   MACOSX_BUNDLE TRUE
   MACOSX_FRAMEWORK_IDENTIFIER org.cmake.ExecutableTarget
   MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/Info.plist")
+
