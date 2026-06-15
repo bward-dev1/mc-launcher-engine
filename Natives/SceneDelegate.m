@@ -16,6 +16,9 @@ extern UIWindow *mainWindow;
     self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
     self.window.frame = windowScene.coordinateSpace.bounds;
     mainWindow = self.window;
+    // MC Launcher theme: global Minecraft-green tint + dark mode
+    self.window.tintColor = [UIColor colorWithRed:0.498 green:0.698 blue:0.220 alpha:1.0];
+    self.window.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
     launchInitialViewController(self.window);
     [self.window makeKeyAndVisible];
 }
@@ -55,3 +58,4 @@ extern UIWindow *mainWindow;
 }
 
 @end
+
