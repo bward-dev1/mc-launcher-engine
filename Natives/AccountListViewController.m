@@ -1,4 +1,5 @@
 #import <AuthenticationServices/AuthenticationServices.h>
+#import <CommonCrypto/CommonCrypto.h>
 
 #import "authenticator/BaseAuthenticator.h"
 #import "AccountListViewController.h"
@@ -14,6 +15,15 @@
 @property(nonatomic) ASWebAuthenticationSession *authVC;
 
 @end
+
+static NSString *const kMCLClientID = @""; // <<< PASTE AZURE CLIENT ID HERE (same as MicrosoftAuthenticator.m)
+static NSString *mclB64URL(NSData *d){
+    NSString *s=[d base64EncodedStringWithOptions:0];
+    s=[s stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
+    s=[s stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    s=[s stringByReplacingOccurrencesOfString:@"=" withString:@""];
+    return s;
+}
 
 @implementation AccountListViewController
 
@@ -195,11 +205,20 @@
 }
 
 - (void)actionLoginMicrosoft:(UITableViewCell *)sender {
-    NSURL *url = [NSURL URLWithString:@"https://login.live.com/oauth20_authorize.srf?client_id=00000000402b5328&response_type=code&scope=service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL&redirect_url=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf"];
+    // PKCE: generate verifier + S256 challenge, stash verifier for the token exchange
+    uint8_t vbytes[32]; arc4random_buf(vbytes, sizeof(vbytes));
+    NSString *verifier = mclB64URL([NSData dataWithBytes:vbytes length:32]);
+    [NSUserDefaults.standardUserDefaults setObject:verifier forKey:@"_mcl_pkce"];
+    NSData *vUtf8 = [verifier dataUsingEncoding:NSUTF8StringEncoding];
+    unsigned char hash[CC_SHA256_DIGEST_LENGTH];
+    CC_SHA256(vUtf8.bytes, (CC_LONG)vUtf8.length, hash);
+    NSString *challenge = mclB64URL([NSData dataWithBytes:hash length:CC_SHA256_DIGEST_LENGTH]);
+    NSString *authStr = [NSString stringWithFormat:@"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=%@&response_type=code&redirect_uri=mclauncher%%3A%%2F%%2Fauth&scope=XboxLive.signin%%20offline_access&code_challenge=%@&code_challenge_method=S256&prompt=select_account", kMCLClientID, challenge];
+    NSURL *url = [NSURL URLWithString:authStr];
 
     self.authVC =
         [[ASWebAuthenticationSession alloc] initWithURL:url
-        callbackURLScheme:@"ms-xal-00000000402b5328"
+        callbackURLScheme:@"mclauncher"
         completionHandler:^(NSURL * _Nullable callbackURL, NSError * _Nullable error)
     {
         if (callbackURL == nil) {
@@ -289,3 +308,4 @@
 }
 
 @end
+
