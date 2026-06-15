@@ -1,4 +1,5 @@
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#import "LauncherExtrasViewController.h"
 #import "authenticator/BaseAuthenticator.h"
 #import "AFNetworking.h"
 #import "ALTServerConnection.h"
@@ -91,8 +92,10 @@ static void *ProgressObserverContext = &ProgressObserverContext;
         });
         [textFieldContainer addSubview:self.versionTextField];
         UIBarButtonItem *textFieldItem = [[UIBarButtonItem alloc] initWithCustomView:textFieldContainer];
+        UIBarButtonItem *extrasItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"wand.and.stars"] style:UIBarButtonItemStylePlain target:self action:@selector(openExtras)];
         self.globalToolbarItems = @[
             textFieldItem,
+            extrasItem,
             self.buttonInstallItem,
         ];
     } else {
@@ -532,4 +535,13 @@ static void *ProgressObserverContext = &ProgressObserverContext;
     }
 }
 
+
+- (void)openExtras {
+    LauncherExtrasViewController *vc = [[LauncherExtrasViewController alloc] init];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    nav.modalPresentationStyle = UIModalPresentationFormSheet;
+    [self presentViewController:nav animated:YES completion:nil];
+}
+
 @end
+
