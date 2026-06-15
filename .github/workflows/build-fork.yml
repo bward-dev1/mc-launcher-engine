@@ -1,0 +1,60 @@
+name: Build engine (hosted macos-15)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-fork.yml'
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Select newest Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)"
+
+      - name: Install build toolchain
+        run: |
+          brew install ldid dpkg make cmake pkg-config automake autoconf libtool gnu-sed || true
+          echo "$(brew --prefix make)/libexec/gnubin" >> "$GITHUB_PATH"
+          echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '8'
+
+      - name: Verify toolchain
+        run: |
+          which gmake ldid dpkg-deb cmake || true
+          /usr/libexec/java_home -v 1.8 || true
+          gmake --version | head -1
+
+      - name: Build engine (.ipa)
+        run: |
+          export SLIMMED=1
+          gmake -j$(sysctl -n hw.ncpu) package PLATFORM=2 2>&1 | tail -300
+
+      - name: List artifacts
+        if: always()
+        run: ls -lhR artifacts 2>/dev/null || echo "no artifacts/"
+
+      - name: Verify + upload ipa
+        run: |
+          set -eo pipefail
+          IPA=$(find artifacts -name "*.ipa" | head -1)
+          test -n "$IPA" || { echo "::error::no ipa produced"; exit 1; }
+          echo "Produced: $IPA"
+          unzip -l "$IPA" | grep -iE "\.app/(AngelAuraAmethyst|Info.plist)$" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: engine-ipa
+          path: artifacts/*.ipa
+          if-no-files-found: warn
