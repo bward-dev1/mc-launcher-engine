@@ -279,7 +279,7 @@ native: dep_mg
 
 java:
 	echo '[Amethyst v$(VERSION)] java - start'
-	$(MAKE) -C JavaApp -j$(JOBS) BOOTJDK=$(BOOTJDK)
+	$(MAKE) -C JavaApp BOOTJDK=$(BOOTJDK)
 	echo '[Amethyst v$(VERSION)] java - end'
 
 jre: native
@@ -432,4 +432,5 @@ clean:
 		
 
 .PHONY: all clean check native java jre package dsym deploy help
+
 
