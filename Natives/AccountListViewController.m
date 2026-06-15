@@ -16,7 +16,7 @@
 
 @end
 
-static NSString *const kMCLClientID = @""; // <<< PASTE AZURE CLIENT ID HERE (same as MicrosoftAuthenticator.m)
+static NSString *const kMCLClientID = @"44fca90d-9072-487c-a5b1-ebe20adca16a"; // <<< PASTE AZURE CLIENT ID HERE (same as MicrosoftAuthenticator.m)
 static NSString *mclB64URL(NSData *d){
     NSString *s=[d base64EncodedStringWithOptions:0];
     s=[s stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
