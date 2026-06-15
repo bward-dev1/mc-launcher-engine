@@ -1,8 +1,11 @@
 #import "AFNetworking.h"
+#import <CommonCrypto/CommonCrypto.h>
 #import "BaseAuthenticator.h"
 #import "../ios_uikit_bridge.h"
 #import "../utils.h"
 #include "jni.h"
+
+static NSString *const kMCLClientID = @""; // <<< PASTE AZURE CLIENT ID HERE
 
 typedef void(^XSTSCallback)(NSString *xsts, NSString *uhs);
 
@@ -11,18 +14,23 @@ typedef void(^XSTSCallback)(NSString *xsts, NSString *uhs);
 - (void)acquireAccessToken:(NSString *)authcode refresh:(BOOL)refresh callback:(Callback)callback {
     callback(localize(@"login.msa.progress.acquireAccessToken", nil), YES);
 
-    NSDictionary *data = @{
-        @"client_id": @"00000000402b5328",
-        (refresh ? @"refresh_token" : @"code"): authcode,
+    NSMutableDictionary *data = [@{
+        @"client_id": kMCLClientID,
         @"grant_type": refresh ? @"refresh_token" : @"authorization_code",
-        @"redirect_url": @"https://login.live.com/oauth20_desktop.srf",
-        @"scope": @"service::user.auth.xboxlive.com::MBI_SSL"
-    };
+        @"redirect_uri": @"mclauncher://auth",
+        @"scope": @"XboxLive.signin offline_access"
+    } mutableCopy];
+    if (refresh) {
+        data[@"refresh_token"] = authcode;
+    } else {
+        data[@"code"] = authcode;
+        data[@"code_verifier"] = [NSUserDefaults.standardUserDefaults stringForKey:@"_mcl_pkce"] ?: @"";
+    }
 
     AFHTTPSessionManager *manager = AFHTTPSessionManager.manager;
-    [manager GET:@"https://login.live.com/oauth20_token.srf" parameters:data headers:nil progress:nil success:^(NSURLSessionDataTask *task, NSDictionary *response) {
+    [manager POST:@"https://login.microsoftonline.com/consumers/oauth2/v2.0/token" parameters:data headers:nil progress:nil success:^(NSURLSessionDataTask *task, NSDictionary *response) {
         self.authData[@"msaRefreshToken"] = response[@"refresh_token"];
-        [self acquireXBLToken:response[@"access_token"] callback:callback];
+        [self acquireXBLToken:[@"d=" stringByAppendingString:response[@"access_token"]] callback:callback];
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (error.code == NSURLErrorDataNotAllowed) {
             // The account token is expired and offline
@@ -300,3 +308,4 @@ typedef void(^XSTSCallback)(NSString *xsts, NSString *uhs);
 }
 
 @end
+
