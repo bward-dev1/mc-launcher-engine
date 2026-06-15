@@ -5,7 +5,7 @@
 #import "../utils.h"
 #include "jni.h"
 
-static NSString *const kMCLClientID = @""; // <<< PASTE AZURE CLIENT ID HERE
+static NSString *const kMCLClientID = @"44fca90d-9072-487c-a5b1-ebe20adca16a"; // <<< PASTE AZURE CLIENT ID HERE
 
 typedef void(^XSTSCallback)(NSString *xsts, NSString *uhs);
 
