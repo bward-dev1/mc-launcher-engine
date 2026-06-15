@@ -31,26 +31,26 @@ jobs:
 
       - name: Verify toolchain
         run: |
-          which gmake ldid dpkg-deb cmake || true
-          /usr/libexec/java_home -v 1.8 || true
-          gmake --version | head -1
+          which gmake ldid dpkg-deb cmake
+          echo "JAVA_HOME=$JAVA_HOME"
+          "$JAVA_HOME/bin/javac" -version
 
       - name: Build engine (.ipa)
         run: |
+          set -o pipefail
           export SLIMMED=1
-          gmake -j$(sysctl -n hw.ncpu) package PLATFORM=2 2>&1 | tail -300
+          gmake -j$(sysctl -n hw.ncpu) BOOTJDK="$JAVA_HOME/bin" package PLATFORM=2
 
       - name: List artifacts
         if: always()
         run: ls -lhR artifacts 2>/dev/null || echo "no artifacts/"
 
-      - name: Verify + upload ipa
+      - name: Verify ipa
         run: |
           set -eo pipefail
           IPA=$(find artifacts -name "*.ipa" | head -1)
           test -n "$IPA" || { echo "::error::no ipa produced"; exit 1; }
           echo "Produced: $IPA"
-          unzip -l "$IPA" | grep -iE "\.app/(AngelAuraAmethyst|Info.plist)$" || true
 
       - uses: actions/upload-artifact@v4
         if: always()
