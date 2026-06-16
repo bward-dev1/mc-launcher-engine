@@ -24,16 +24,18 @@ extern UIWindow *mainWindow;
     UIColor *emeraldText = [UIColor colorWithRed:0.918 green:0.953 blue:0.863 alpha:1.0];
     if (@available(iOS 13.0, *)) {
         UINavigationBarAppearance *navA = [[UINavigationBarAppearance alloc] init];
-        [navA configureWithOpaqueBackground];
-        navA.backgroundColor = emeraldDark;
+        [navA configureWithDefaultBackground];
+        navA.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterialDark];
+        navA.backgroundColor = [UIColor colorWithRed:0.055 green:0.082 blue:0.047 alpha:0.55];
         navA.titleTextAttributes = @{NSForegroundColorAttributeName: emeraldText};
         navA.largeTitleTextAttributes = @{NSForegroundColorAttributeName: emeraldText};
         UINavigationBar.appearance.standardAppearance = navA;
         UINavigationBar.appearance.scrollEdgeAppearance = navA;
         UINavigationBar.appearance.compactAppearance = navA;
         UIToolbarAppearance *tbA = [[UIToolbarAppearance alloc] init];
-        [tbA configureWithOpaqueBackground];
-        tbA.backgroundColor = emeraldDark;
+        [tbA configureWithDefaultBackground];
+        tbA.backgroundEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemUltraThinMaterialDark];
+        tbA.backgroundColor = [UIColor colorWithRed:0.055 green:0.082 blue:0.047 alpha:0.55];
         UIToolbar.appearance.standardAppearance = tbA;
         UIToolbar.appearance.scrollEdgeAppearance = tbA;
         UITableView.appearance.backgroundColor = emeraldDark;
@@ -77,6 +79,7 @@ extern UIWindow *mainWindow;
 }
 
 @end
+
 
 
 
