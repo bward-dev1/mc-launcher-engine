@@ -24,5 +24,7 @@ typedef void(^Callback)(id status, BOOL success);
 @interface MicrosoftAuthenticator : BaseAuthenticator
 
 + (void)clearTokenDataOfProfile:(NSString *)profile;
+- (void)loginWithDeviceCodeDisplay:(void(^)(NSString *userCode, NSString *url))display callback:(Callback)callback;
 
 @end
+
