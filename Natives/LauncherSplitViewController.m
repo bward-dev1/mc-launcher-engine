@@ -15,7 +15,7 @@ extern NSMutableDictionary *prefDict;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = UIColor.systemBackgroundColor;
+    self.view.backgroundColor = [UIColor colorWithRed:0.055 green:0.082 blue:0.047 alpha:1.0]; // Emerald backdrop
     if ([getPrefObject(@"control.control_safe_area") length] == 0) {
         setPrefObject(@"control.control_safe_area", NSStringFromUIEdgeInsets(getDefaultSafeArea()));
     }
@@ -67,3 +67,4 @@ extern NSMutableDictionary *prefDict;
 }
 
 @end
+
