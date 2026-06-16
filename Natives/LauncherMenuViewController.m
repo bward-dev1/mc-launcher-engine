@@ -173,6 +173,11 @@
 
         self.accountButton.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, -4);
         self.accountButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.accountButton.layer.shadowColor = [UIColor colorWithRed:0.24 green:0.86 blue:0.52 alpha:1.0].CGColor;
+        self.accountButton.layer.shadowOpacity = 0.45;
+        self.accountButton.layer.shadowRadius = 8;
+        self.accountButton.layer.shadowOffset = CGSizeZero;
+        self.accountButton.layer.masksToBounds = NO;
         self.accountButton.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
         self.accountBtnItem = [[UIBarButtonItem alloc] initWithCustomView:self.accountButton];
     }
@@ -225,6 +230,8 @@
     cell.textLabel.textColor = [UIColor colorWithRed:0.918 green:0.953 blue:0.863 alpha:1.0];
     UIView *mclSel = [UIView new];
     mclSel.backgroundColor = [UIColor colorWithRed:0.24 green:0.86 blue:0.52 alpha:0.20];
+    mclSel.layer.cornerRadius = 12;
+    mclSel.layer.masksToBounds = YES;
     cell.selectedBackgroundView = mclSel;
     return cell;
 }
@@ -380,5 +387,6 @@
 }
 
 @end
+
 
 
