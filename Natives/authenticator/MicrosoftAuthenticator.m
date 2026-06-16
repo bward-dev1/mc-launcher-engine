@@ -7,6 +7,8 @@
 
 static NSString *const kMCLClientID = @"44fca90d-9072-487c-a5b1-ebe20adca16a"; // <<< PASTE AZURE CLIENT ID HERE
 
+#define MCL_FALLBACK_CLIENT_ID @"6a3728d6-27a3-4180-99bb-479895b8f88e" // HMCL (temporary fallback)
+
 typedef void(^XSTSCallback)(NSString *xsts, NSString *uhs);
 
 @implementation MicrosoftAuthenticator
@@ -307,5 +309,48 @@ typedef void(^XSTSCallback)(NSString *xsts, NSString *uhs);
     return [MicrosoftAuthenticator tokenDataOfProfile:self.authData[@"xuid"]];
 }
 
+
+- (void)loginWithDeviceCodeDisplay:(void(^)(NSString *userCode, NSString *url))display callback:(Callback)callback {
+    callback(@"Starting backup sign-in…", YES);
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode"]];
+    req.HTTPMethod = @"POST";
+    [req setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    req.HTTPBody = [[NSString stringWithFormat:@"client_id=%@&scope=XboxLive.signin%%20offline_access", MCL_FALLBACK_CLIENT_ID] dataUsingEncoding:NSUTF8StringEncoding];
+    [[NSURLSession.sharedSession dataTaskWithRequest:req completionHandler:^(NSData *data, NSURLResponse *resp, NSError *error) {
+        NSDictionary *r = data ? [NSJSONSerialization JSONObjectWithData:data options:0 error:nil] : nil;
+        NSString *deviceCode = r[@"device_code"], *userCode = r[@"user_code"], *url = r[@"verification_uri"];
+        NSInteger interval = [r[@"interval"] integerValue]; if (interval < 1) interval = 5;
+        if (!deviceCode) { callback(error ?: @"Backup sign-in failed", NO); return; }
+        dispatch_async(dispatch_get_main_queue(), ^{ if (display) display(userCode, url); });
+        [self pollDeviceCode:deviceCode interval:interval deadline:[NSDate dateWithTimeIntervalSinceNow:840] callback:callback];
+    }] resume];
+}
+
+- (void)pollDeviceCode:(NSString *)deviceCode interval:(NSInteger)interval deadline:(NSDate *)deadline callback:(Callback)callback {
+    if (deadline.timeIntervalSinceNow <= 0) { callback(@"Backup sign-in timed out", NO); return; }
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://login.microsoftonline.com/consumers/oauth2/v2.0/token"]];
+    req.HTTPMethod = @"POST";
+    [req setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    req.HTTPBody = [[NSString stringWithFormat:@"grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=%@&device_code=%@", MCL_FALLBACK_CLIENT_ID, deviceCode] dataUsingEncoding:NSUTF8StringEncoding];
+    [[NSURLSession.sharedSession dataTaskWithRequest:req completionHandler:^(NSData *data, NSURLResponse *resp, NSError *error) {
+        NSDictionary *r = data ? [NSJSONSerialization JSONObjectWithData:data options:0 error:nil] : nil;
+        NSString *at = r[@"access_token"];
+        if (at.length) {
+            self.authData[@"msaRefreshToken"] = r[@"refresh_token"];
+            [self acquireXBLToken:[@"d=" stringByAppendingString:at] callback:callback];
+            return;
+        }
+        NSString *e = r[@"error"];
+        if ([e isEqualToString:@"authorization_pending"] || [e isEqualToString:@"slow_down"]) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(interval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self pollDeviceCode:deviceCode interval:interval deadline:deadline callback:callback];
+            });
+        } else {
+            callback(e ?: @"Backup sign-in failed", NO);
+        }
+    }] resume];
+}
+
 @end
+
 
