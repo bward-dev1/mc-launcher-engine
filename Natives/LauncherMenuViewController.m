@@ -287,8 +287,9 @@
     }
 
     // Remove the prefix "Demo." if there is
-    BOOL isDemo = [selected[@"username"] hasPrefix:@"Demo."];
-    NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:[selected[@"username"] substringFromIndex:(isDemo?5:0)]];
+    NSString *mclUsername = selected[@"username"] ?: @"";
+    BOOL isDemo = [mclUsername hasPrefix:@"Demo."];
+    NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithString:[mclUsername substringFromIndex:(isDemo?5:0)]];
 
     // Check if we're switching between demo and full mode
     BOOL shouldUpdateProfiles = (getenv("DEMO_LOCK")!=NULL) != isDemo;
@@ -309,7 +310,7 @@
         subtitle = selected[@"xboxGamertag"];
     }
 
-    subtitle = [[NSAttributedString alloc] initWithString:subtitle attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    subtitle = [[NSAttributedString alloc] initWithString:(subtitle ?: @"") attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
     [title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:nil]];
     [title appendAttributedString:subtitle];
     
@@ -372,3 +373,4 @@
 }
 
 @end
+
