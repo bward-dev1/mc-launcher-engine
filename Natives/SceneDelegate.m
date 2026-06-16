@@ -36,6 +36,7 @@ extern UIWindow *mainWindow;
         tbA.backgroundColor = emeraldDark;
         UIToolbar.appearance.standardAppearance = tbA;
         UIToolbar.appearance.scrollEdgeAppearance = tbA;
+        UITableView.appearance.backgroundColor = emeraldDark;
     }
     launchInitialViewController(self.window);
     [self.window makeKeyAndVisible];
@@ -76,5 +77,6 @@ extern UIWindow *mainWindow;
 }
 
 @end
+
 
 
