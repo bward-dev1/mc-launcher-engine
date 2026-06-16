@@ -114,6 +114,7 @@
     }
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor = [UIColor colorWithRed:0.055 green:0.082 blue:0.047 alpha:1.0];
     
     self.navigationController.toolbarHidden = NO;
     UIActivityIndicatorViewStyle indicatorStyle = UIActivityIndicatorViewStyleMedium;
@@ -219,6 +220,12 @@
             performSelector:@selector(imageName)]];
         cell.imageView.image = [cell.imageView.image _imageWithSize:CGSizeMake(40, 40)];
     }
+    cell.backgroundColor = UIColor.clearColor;
+    cell.tintColor = [UIColor colorWithRed:0.24 green:0.86 blue:0.52 alpha:1.0];
+    cell.textLabel.textColor = [UIColor colorWithRed:0.918 green:0.953 blue:0.863 alpha:1.0];
+    UIView *mclSel = [UIView new];
+    mclSel.backgroundColor = [UIColor colorWithRed:0.24 green:0.86 blue:0.52 alpha:0.20];
+    cell.selectedBackgroundView = mclSel;
     return cell;
 }
 
@@ -373,4 +380,5 @@
 }
 
 @end
+
 
