@@ -291,11 +291,14 @@ static NSString *mclB64URL(NSData *d){
     };
     void(^display)(NSString *, NSString *) = ^(NSString *userCode, NSString *url) {
         if (userCode) UIPasteboard.generalPasteboard.string = userCode;
-        UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Sign in (backup)"
+        UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Sign in (backup) - use code within 15 min"
             message:[NSString stringWithFormat:@"Your own login is still activating, so we're using the backup just this time.\n\nGo to:\n%@\n\nand enter code:\n%@\n\n(code copied to clipboard)", url, userCode]
             preferredStyle:UIAlertControllerStyleAlert];
-        [a addAction:[UIAlertAction actionWithTitle:@"Open page" style:UIAlertActionStyleDefault handler:^(UIAlertAction *x){
+        [a addAction:[UIAlertAction actionWithTitle:@"Open Microsoft sign-in" style:UIAlertActionStyleDefault handler:^(UIAlertAction *x){
             [UIApplication.sharedApplication openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
+        }]];
+        [a addAction:[UIAlertAction actionWithTitle:@"Copy code again" style:UIAlertActionStyleDefault handler:^(UIAlertAction *x){
+            if (userCode) UIPasteboard.generalPasteboard.string = userCode;
         }]];
         [a addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
         [self presentViewController:a animated:YES completion:nil];
@@ -335,5 +338,6 @@ static NSString *mclB64URL(NSData *d){
 }
 
 @end
+
 
 
