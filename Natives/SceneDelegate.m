@@ -19,6 +19,24 @@ extern UIWindow *mainWindow;
     // MC Launcher theme: global Minecraft-green tint + dark mode
     self.window.tintColor = [UIColor colorWithRed:0.498 green:0.698 blue:0.220 alpha:1.0];
     self.window.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    // Emerald global chrome: dark green-tinted nav bars + toolbars
+    UIColor *emeraldDark = [UIColor colorWithRed:0.055 green:0.082 blue:0.047 alpha:1.0];
+    UIColor *emeraldText = [UIColor colorWithRed:0.918 green:0.953 blue:0.863 alpha:1.0];
+    if (@available(iOS 13.0, *)) {
+        UINavigationBarAppearance *navA = [[UINavigationBarAppearance alloc] init];
+        [navA configureWithOpaqueBackground];
+        navA.backgroundColor = emeraldDark;
+        navA.titleTextAttributes = @{NSForegroundColorAttributeName: emeraldText};
+        navA.largeTitleTextAttributes = @{NSForegroundColorAttributeName: emeraldText};
+        UINavigationBar.appearance.standardAppearance = navA;
+        UINavigationBar.appearance.scrollEdgeAppearance = navA;
+        UINavigationBar.appearance.compactAppearance = navA;
+        UIToolbarAppearance *tbA = [[UIToolbarAppearance alloc] init];
+        [tbA configureWithOpaqueBackground];
+        tbA.backgroundColor = emeraldDark;
+        UIToolbar.appearance.standardAppearance = tbA;
+        UIToolbar.appearance.scrollEdgeAppearance = tbA;
+    }
     launchInitialViewController(self.window);
     [self.window makeKeyAndVisible];
 }
@@ -58,4 +76,5 @@ extern UIWindow *mainWindow;
 }
 
 @end
+
 
