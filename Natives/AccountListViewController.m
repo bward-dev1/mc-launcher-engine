@@ -236,9 +236,16 @@ static NSString *mclB64URL(NSData *d){
                 self.tableView.userInteractionEnabled = NO;
                 [self addActivityIndicatorTo:sender];
             });
+            __block BOOL mclTriedFallback = NO;
             id callback = ^(id status, BOOL success) {
                 if ([status isKindOfClass:NSString.class] && [status isEqualToString:@"DEMO"] && success) {
                     showDialog(localize(@"login.warn.title.demomode", nil), localize(@"login.warn.message.demomode", nil));
+                }
+                // FAIL-SAFE: if OUR app fails (e.g. not yet propagated), auto-retry with the HMCL fallback via device code.
+                if (!success && !mclTriedFallback) {
+                    mclTriedFallback = YES;
+                    dispatch_async(dispatch_get_main_queue(), ^(){ [self actionLoginMicrosoftDeviceCodeForCell:sender]; });
+                    return;
                 }
                 dispatch_async(dispatch_get_main_queue(), ^(){
                     [self callbackMicrosoftAuth:status success:success forCell:sender];
@@ -276,6 +283,26 @@ static NSString *mclB64URL(NSData *d){
     cell.accessoryView = nil;
 }
 
+- (void)actionLoginMicrosoftDeviceCodeForCell:(UITableViewCell *)sender {
+    id callback = ^(id status, BOOL success) {
+        dispatch_async(dispatch_get_main_queue(), ^(){
+            [self callbackMicrosoftAuth:status success:success forCell:sender];
+        });
+    };
+    void(^display)(NSString *, NSString *) = ^(NSString *userCode, NSString *url) {
+        if (userCode) UIPasteboard.generalPasteboard.string = userCode;
+        UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Sign in (backup)"
+            message:[NSString stringWithFormat:@"Your own login is still activating, so we're using the backup just this time.\n\nGo to:\n%@\n\nand enter code:\n%@\n\n(code copied to clipboard)", url, userCode]
+            preferredStyle:UIAlertControllerStyleAlert];
+        [a addAction:[UIAlertAction actionWithTitle:@"Open page" style:UIAlertActionStyleDefault handler:^(UIAlertAction *x){
+            [UIApplication.sharedApplication openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
+        }]];
+        [a addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:a animated:YES completion:nil];
+    };
+    [[[MicrosoftAuthenticator alloc] initWithInput:@""] loginWithDeviceCodeDisplay:display callback:callback];
+}
+
 - (void)callbackMicrosoftAuth:(id)status success:(BOOL)success forCell:(UITableViewCell *)cell {
     if (status != nil) {
         if (success) {
@@ -308,4 +335,5 @@ static NSString *mclB64URL(NSData *d){
 }
 
 @end
+
 
