@@ -104,7 +104,12 @@ static void *ProgressObserverContext = &ProgressObserverContext;
         [self.buttonInstall setTitle:localize(@"Play", nil) forState:UIControlStateNormal];
         self.buttonInstall.autoresizingMask = AUTORESIZE_MASKS;
         self.buttonInstall.backgroundColor = [UIColor colorWithRed:31/255.0 green:157/255.0 blue:91/255.0 alpha:1.0];
-        self.buttonInstall.layer.cornerRadius = 5;
+        self.buttonInstall.layer.cornerRadius = 16;
+        self.buttonInstall.layer.shadowColor = [UIColor colorWithRed:61/255.0 green:220/255.0 blue:132/255.0 alpha:1.0].CGColor;
+        self.buttonInstall.layer.shadowOpacity = 0.75;
+        self.buttonInstall.layer.shadowRadius = 12;
+        self.buttonInstall.layer.shadowOffset = CGSizeZero;
+        self.buttonInstall.layer.masksToBounds = NO;
         self.buttonInstall.frame = CGRectMake(self.toolbar.frame.size.width * 0.8, 4, self.toolbar.frame.size.width * 0.2, self.toolbar.frame.size.height - 8);
         self.buttonInstall.tintColor = UIColor.whiteColor;
         self.buttonInstall.enabled = NO;
@@ -544,5 +549,6 @@ static void *ProgressObserverContext = &ProgressObserverContext;
 }
 
 @end
+
 
 
