@@ -169,6 +169,30 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
 
         // Setup POJAV_RENDERER
         NSString *renderer = [PLProfiles resolveKeyForCurrentProfile:@"renderer"];
+        // --- Emerald renderer profiles ---
+        // Translate Emerald preset ids into a real, shipped dylib + tuned env.
+        // Keeps everything downstream (egl_bridge, lwjgl libname) keyed on a dylib
+        // name that actually exists in Frameworks/.
+        if ([renderer isEqualToString:@"zink_turbo"]) {
+            // Zink, tuned for throughput on A12-class GPUs
+            setenv("GALLIUM_DRIVER", "zink", 1);
+            setenv("mesa_glthread", "true", 1);
+            setenv("MESA_NO_ERROR", "1", 1);
+            setenv("ZINK_DESCRIPTORS", "lazy", 1);
+            renderer = @ RENDERER_NAME_VK_ZINK;
+        } else if ([renderer isEqualToString:@"gl4es_compat"]) {
+            // gl4es with forgiving compat hacks for old/heavily-modded packs
+            setenv("LIBGL_NOERROR", "1", 1);
+            setenv("LIBGL_NPOT", "2", 1);
+            setenv("LIBGL_DEFAULTWRAP", "2", 1);
+            setenv("LIBGL_MIPMAP", "3", 1);
+            setenv("LIBGL_GL", "21", 1);
+            renderer = @ RENDERER_NAME_GL4ES;
+        } else if ([renderer isEqualToString:@ RENDERER_NAME_MOBILEGLUES]) {
+            // MobileGlues never ships a dylib in this build -> would black-screen.
+            // Silently heal any stale profile to Zink.
+            renderer = @ RENDERER_NAME_VK_ZINK;
+        }
         NSLog(@"[JavaLauncher] RENDERER is set to %@\n", renderer);
         setenv("POJAV_RENDERER", renderer.UTF8String, 1);
         // Setup gameDir
