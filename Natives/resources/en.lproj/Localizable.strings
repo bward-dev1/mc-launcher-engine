@@ -133,7 +133,7 @@
 
 "preference.section.general" = "General Settings";
 "preference.section.video" = "Video and Audio Settings";
-"preference.section.footer.video" = "Auto renderer allows Amethyst to choose the best option based on Minecraft version. Decreasing resolution reduces GPU workload for better performance.";
+"preference.section.footer.video" = "Auto (Smart) lets Emerald pick the right renderer per Minecraft version (GL4ES for ≤1.16, Zink for 1.17+). Zink (Vulkan) is the most compatible for modern versions; ANGLE is a Metal-backed fallback. Decreasing resolution reduces GPU workload for better performance.";
 "preference.section.control" = "Control customization";
 "preference.section.debug" = "UI Debugging settings";
 "preference.section.footer.debug" = "You may need to restart the launcher for changes to take effect.";
@@ -174,19 +174,21 @@
 
 "preference.title.renderer" = "Renderer";
 
-"preference.title.renderer.release.auto" = "Auto";
-"preference.title.renderer.release.gl4es" = "holy gl4es";
-"preference.title.renderer.release.angle" = "ANGLE";
-"preference.title.renderer.release.mg" = "MobileGlues";
-"preference.title.renderer.release.zink" = "Zink";
+"preference.title.renderer.release.auto" = "Auto (Smart)";
+"preference.title.renderer.release.gl4es" = "GL4ES";
+"preference.title.renderer.release.gl4es_compat" = "GL4ES High-Compat";
+"preference.title.renderer.release.angle" = "ANGLE (Metal)";
+"preference.title.renderer.release.zink" = "Zink (Vulkan)";
+"preference.title.renderer.release.zink_turbo" = "Zink Turbo";
 
-"preference.title.renderer.debug.auto" = "Auto: gl4es or ANGLE";
-"preference.title.renderer.debug.gl4es" = "holy gl4es - exports OpenGL 2.1";
-"preference.title.renderer.debug.angle" = "ANGLE (1.17+) - exports OpenGL 3.2 (Core Profile, limited)";
-"preference.title.renderer.debug.mg" = "MobileGlues (1.17+) - exports OpenGL 4.0, EXPERIMENTAL";
-"preference.title.renderer.debug.zink" = "Zink (Mesa 21.0) - exports OpenGL 4.1";
+"preference.title.renderer.debug.auto" = "Auto (Smart) - gl4es for ≤1.16, Zink for 1.17+";
+"preference.title.renderer.debug.gl4es" = "GL4ES - OpenGL 2.1, best for ≤1.16.5 & old Forge";
+"preference.title.renderer.debug.gl4es_compat" = "GL4ES High-Compat - forgiving hacks for stubborn/modded packs";
+"preference.title.renderer.debug.angle" = "ANGLE (Metal) - OpenGL 3.2 core via Apple Metal";
+"preference.title.renderer.debug.zink" = "Zink (Vulkan) - OpenGL 4.1 via MoltenVK, recommended for 1.17+";
+"preference.title.renderer.debug.zink_turbo" = "Zink Turbo - threaded Vulkan, fastest for 1.17+ (skips GL error checks)";
 
-"preference.detail.renderer" = "Change the OpenGL render engine to use. Zink is temporarily disabled on iOS 16 and later to diagnose issues.";
+"preference.detail.renderer" = "Change the OpenGL render engine. Auto (Smart) picks GL4ES for old versions and Zink for 1.17+. If a world loads to a black screen, switch to Zink (or ANGLE).";
 
 "preference.title.resolution" = "Resolution (%)";
 "preference.detail.resolution" = "Allows you to decrease the game resolution.";
