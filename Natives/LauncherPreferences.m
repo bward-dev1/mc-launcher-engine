@@ -134,12 +134,17 @@ NSString* getSelectedJavaHome(NSString* defaultJRETag, int minVersion) {
 
 #pragma mark Renderer
 NSArray* getRendererKeys(BOOL containsDefault) {
+    // Emerald renderer set — every key maps to a dylib that actually ships in the
+    // bundle (gl4es_114 / tinygl4angle / OSMesa.8). MobileGlues was removed because
+    // its dylib is never built here (black-screen trap). "gl4es_compat" and
+    // "zink_turbo" are Emerald presets resolved in JavaLauncher to a real dylib + env.
     NSMutableArray *array = @[
         @"auto",
         @ RENDERER_NAME_GL4ES,
+        @"gl4es_compat",
         @ RENDERER_NAME_MTL_ANGLE,
-        @ RENDERER_NAME_MOBILEGLUES,
-        @ RENDERER_NAME_VK_ZINK
+        @ RENDERER_NAME_VK_ZINK,
+        @"zink_turbo"
     ].mutableCopy;
 
     if (containsDefault) {
@@ -155,9 +160,10 @@ NSArray* getRendererNames(BOOL containsDefault) {
     array = @[
         localize(@"preference.title.renderer.debug.auto", nil),
         localize(@"preference.title.renderer.debug.gl4es", nil),
+        localize(@"preference.title.renderer.debug.gl4es_compat", nil),
         localize(@"preference.title.renderer.debug.angle", nil),
-        localize(@"preference.title.renderer.debug.mg", nil),
-        localize(@"preference.title.renderer.debug.zink", nil)
+        localize(@"preference.title.renderer.debug.zink", nil),
+        localize(@"preference.title.renderer.debug.zink_turbo", nil)
     ].mutableCopy;
 
     if (containsDefault) {
